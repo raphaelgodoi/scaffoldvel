@@ -1,0 +1,26 @@
+{
+    "name": "raphagodoi/scaffoldvel",
+    "description": "Extend Laravel 5's generators scaffold and create custom views",
+    "keywords": ["laravel", "generators", "scaffold" , "laravel5"],
+    "type": "package",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Raphael Godoi",
+            "email": "raphael.godoi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "laravel/laravel": "dev-master",
+        "phpunit/phpunit": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "RaphaGodoi\\ScaffoldVel\\": "src/"
+        }
+    }
+}
