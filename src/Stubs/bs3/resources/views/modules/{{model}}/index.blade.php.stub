@@ -1,0 +1,15 @@
+<div class="container">
+
+   @ability('admin', '{{model}}_create')
+   <div class="actions btn-group">
+      <button type="button" ui-sref="{{model}}_create" class="btn btn-outline btn-primary">{{trans('site.add')}}</button>
+   </div>
+   @endability
+
+   <table ng-table="tableParams" show-filter="true" class="table table-condensed table-striped table-pointer table-hover">
+      <tr ui-sref="{{model}}_show({id: row.id})" ng-repeat="row in $data track by row.id">
+         <td title="'#'" sortable="'id'" filter="{id: 'text'}">@{{row.id}}</td>
+      </tr>
+   </table>
+
+</div>

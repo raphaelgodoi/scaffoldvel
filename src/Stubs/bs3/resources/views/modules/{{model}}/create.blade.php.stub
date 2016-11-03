@@ -1,0 +1,13 @@
+<div class="container">
+
+    <div class="actions">
+        <h1 class="title">{{trans('site.add')}}</h1>
+        <div class="btn-group pull-right" user="group">
+            <button ng-click="save()" ng-disabled="form.$invalid" type="button" class="btn btn-outline btn-primary"><strong>{{trans('site.save')}}</strong></button>
+        </div>
+    </div>
+
+    <form name="form" class="">
+        {{fields}}
+    </form>
+</div>

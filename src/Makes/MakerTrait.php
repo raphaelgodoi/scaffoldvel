@@ -3,9 +3,11 @@
 namespace RaphaGodoi\ScaffoldVel\Makes;
 
 use stdClass;
-use RaphaGodoi\ScaffoldVel\Makes\MakeMigration;
 use Illuminate\Filesystem\Filesystem;
 use RaphaGodoi\ScaffoldVel\Commands\ScaffoldMakeCommand;
+use RaphaGodoi\ScaffoldVel\Makes\MakeMigration;
+use RaphaGodoi\ScaffoldVel\Makes\MakeModel;
+use RaphaGodoi\ScaffoldVel\Makes\MakeView;
 
 trait MakerTrait
 {
@@ -84,12 +86,14 @@ trait MakerTrait
 
         $rootViewsPath = base_path("scaffold/{$ui}/");
 
-        $root_files = $this->getFilesRecursive($rootViewsPath);
+        if(!$this->existsDirectory($rootViewsPath)){
+            $root_files = $this->getFilesRecursive($rootViewsPath);
 
-        foreach ($root_files as $file) {
-            $viewFiles[str_replace($rootViewsPath, '', $file)] = $file;
+            foreach ($root_files as $file) {
+                $viewFiles[str_replace($rootViewsPath, '', $file)] = $file;
+            }
         }
-
+        
         return $viewFiles;
     }
 
@@ -122,14 +126,14 @@ trait MakerTrait
         $fileTree = explode('/',$stubName);
 
         $fileName = end($fileTree);
-        $fileType = substr($fileName,0, strpos($fileName,'.'));
         $fileExt  = '.'.substr($fileName, strrpos($fileName, '.') + 1);
+        $fileType = str_replace($fileExt, '', $fileName);
 
         array_pop($fileTree);
         $filePath = implode('/', $fileTree);
 
         $return = new stdClass();
-        $return->path = $filePath;
+        $return->path = $this->buildStub($this->getMeta(),$filePath);
 
         $stubFile = $this->getFile($stubFile);
 
@@ -146,10 +150,24 @@ trait MakerTrait
      */
     protected function buildStubFor($type, $stub)
     {
+
+        if (strpos($type, 'blade') !== false) {
+            $type = 'view';
+        }
+
         switch ($type) {
             case 'migration':
                 $migration = new MakeMigration($this, $this->files);
                 return $migration->compileMigrationStub($stub);
+            break;
+
+            case 'model':
+                $model = new MakeModel($this, $this->files);
+                return $model->compileModelStub($stub);
+            break;
+
+            case 'view':
+                return (new MakeView($this, $this->files))->compileViewStub($stub);
             break;
 
             default:
@@ -178,7 +196,7 @@ trait MakerTrait
             break;
 
             case 'model':
-                return $meta['Model'];
+                return $meta['Model'].$ext;;
             break;
 
             case 'seeder':
@@ -202,6 +220,27 @@ trait MakerTrait
     }
 
     /**
+     * Get fields stubs.
+     *
+     * @return array fields
+     * TODO: permitir sobreescrever esses arquivos por arquivos na pasta raiz do projeto
+     */
+    protected function getStubFields($ui)
+    {
+        $stubsFieldsPath= $this->getStubPath()."fields/";
+        $stubsFieldsFiles = $this->getFilesRecursive($stubsFieldsPath);
+
+        $stubs = [];
+
+        foreach ($stubsFieldsFiles as $file)
+        {
+            $stubs[str_replace($stubsFieldsPath, '', $file)] = $this->getFile($file);
+        }
+
+        return $stubs;
+    }
+
+    /**
      * Build the directory for the class if necessary.
      *
      * @param  string  $path
@@ -209,9 +248,9 @@ trait MakerTrait
      */
     protected function makeDirectory($path)
     {
-        if ( ! $this->files->isDirectory(dirname($path)))
+        if ( ! $this->files->isDirectory($path))
         {
-            $this->files->makeDirectory(dirname($path), 0755, true, true);
+            $this->files->makeDirectory($path, 0755, true, true);
         }
     }
 }

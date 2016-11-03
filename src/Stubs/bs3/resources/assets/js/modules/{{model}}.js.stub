@@ -1,0 +1,193 @@
+angular.module('{{model}}', ['ui.router','confirm.modal.html', 'ngResource', 'ngTable', 'ui.bootstrap']);
+
+angular.module('{{model}}').config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+
+    $stateProvider
+    .state('{{model}}', {
+        url         : "/{{model}}",
+        templateUrl : server+"/views/m/{{model}}",
+        controller  : '{{model}}.list',
+        resolve     : {
+            loginRequired: loginRequired
+        },
+        ncyBreadcrumb: {
+            parent: 'home',
+            label: '{{Model}}'
+        }
+    })
+
+    .state('{{model}}_create', {
+        url         : "/{{model}}/create",
+        templateUrl : server+"/views/m/{{model}}/create",
+        controller  : '{{model}}.create',
+        resolve     : {
+            loginRequired: loginRequired
+        },
+        ncyBreadcrumb: {
+            parent: '{{model}}',
+            label: 'Adicionar'
+        }
+    })
+
+    .state('{{model}}_show', {
+        url         : "/{{model}}/:id",
+        templateUrl : server+"/views/m/{{model}}/show",
+        controller  : '{{model}}.show',
+        resolve     : {
+            loginRequired: loginRequired
+        },
+        ncyBreadcrumb: {
+            parent: '{{model}}',
+            label: '{{{{model}}.id}}'
+        }
+    })
+
+}]);
+
+/**
+ * List Controller
+ */
+angular.module('{{model}}').
+controller('{{model}}.list', ['$scope', '$http', '$auth', '$q', 'NgTableParams', '${{model}}', function($scope, $http, $auth, $q, NgTableParams, ${{model}}) {
+    $scope.tableParams = new NgTableParams({
+        page: 1,
+        count: 10
+    }, {
+        counts: [],
+        filterDelay: 0,
+        getData: function(params) {
+            return ${{model}}.query(params.url()).$promise.then(function(data) {
+                params.total(data.total);
+                return data.data;
+            });
+        }
+    });
+}]);
+
+/**
+ * Create Controller
+ */
+angular.module('{{model}}').
+controller('{{model}}.create', ['$scope', '$state', '${{model}}', function($scope, $state, ${{model}}) {
+    $scope.save = function() {
+        ${{model}}.save($scope.{{model}}).$promise.then(function(data) {
+            $state.go('{{model}}_show', {
+                id: data.id
+            });
+        });
+    }
+}]);
+
+/**
+ * Show, Edit, Delete Controller
+ */
+angular.module('{{model}}').
+controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '${{model}}', function($state, $scope, $stateParams, $uibModal, ${{model}}) {
+
+    $scope.editing = false;
+
+    $scope.toggleEdit = function() {
+        $scope.editing = !$scope.editing;
+    }
+
+    ${{model}}.get({
+        id: $stateParams.id
+    }).$promise.then(function(data) {
+        $scope.{{model}} = data.{{model}};
+    }, function(error) {
+        if (error.status == 404) {
+            $state.go('notFound');
+        }
+    });
+
+    $scope.confirmUpdate = function() {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'confirm.modal.html',
+            size: 'sm',
+            scope: $scope,
+            controller: ['$scope', '$uibModalInstance', '${{model}}', function($scope, $uibModalInstance, ${{model}}) {
+
+                $scope.title = 'Deseja atualizar?';
+                $scope.cancel_text = 'Cancelar';
+                $scope.success_text = 'Concluído';
+
+                var {{model}} = $scope.$parent.{{model}};
+
+                $scope.confirm = function() {
+                    ${{model}}.update({
+                        id: {{model}}.id
+                    }, {{model}}).$promise.then(function(data) {
+                        $uibModalInstance.dismiss('cancel');
+                        $scope.$parent.toggleEdit();
+                    })
+                }
+
+                $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                };
+
+            }]
+        });
+    };
+
+    $scope.confirmDelete = function() {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'confirm.modal.html',
+            size: 'sm',
+            scope: $scope,
+            controller: ['$state', '$scope', '$uibModalInstance', '${{model}}', function($state, $scope, $uibModalInstance, ${{model}}) {
+
+                $scope.title = 'Deseja remover esse registro?';
+                $scope.cancel_text = 'Não';
+                $scope.success_text = 'Sim';
+
+                var {{model}} = $scope.$parent.{{model}};
+
+                $scope.confirm = function() {
+                    ${{model}}.delete({id:{{model}}.id}).$promise.then(function(data){
+                        $uibModalInstance.dismiss('cancel');
+                        $state.go('{{model}}');
+                    })
+                }
+
+                $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                };
+
+            }]
+        });
+    };
+
+}]);
+
+
+/**
+ * Factory
+ */
+angular.module('{{model}}').
+factory("${{model}}", function($resource) {
+    var resource = $resource(api + '{{model}}/:id', null, {
+        'query': {
+            method: 'GET',
+            isArray: false
+        },
+        'update': {
+            method: 'PUT'
+        }
+    });
+    return resource;
+});
+
+angular.module("confirm.modal.html", []).run(["$templateCache", function($templateCache) {
+    $templateCache.put('confirm.modal.html',
+        '<div class="modal-body">' +
+        ' {{title}}' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '    <button class="btn btn-link btn-info" type="button" ng-click="cancel()">{{cancel_text}}</button>' +
+        '    <button class="btn btn-outline btn-success" type="button" ng-click="confirm()">{{success_text}}</button>' +
+        '</div>'
+    );
+}]);

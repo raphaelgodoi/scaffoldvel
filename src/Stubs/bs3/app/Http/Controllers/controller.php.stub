@@ -1,1 +1,122 @@
-asdf
+<?php
+
+namespace App\Http\Controllers;
+
+use DB;
+use App\{{Model}};
+
+use Dingo\Api\Routing\Helpers;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class {{Model}}Controller extends Controller
+{
+    use Helpers;
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        if(!$this->getUser()->ability('admin', '{{model}}'))
+            return $this->response->errorForbidden();
+
+        ${{models}} = new {{Model}}();
+
+        if($request->has('filter')){
+            foreach ($request->get('filter') as $key => $value) {
+                ${{models}} = (strpos($key, 'id') !== false) ? ${{models}}->where($key, '=', $value) : ${{models}}->whereRaw('upper('.$key.') like upper(?)', array('%'.$value.'%'));
+            }
+        }
+
+        if($request->has('sorting')){
+            foreach($request->get('sorting') as $key=>$value){
+                ${{models}} = ${{models}}->orderBy($key, $value);
+            }
+        }
+
+        return ${{models}}->paginate($request->get('count'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        if(!$this->getUser()->ability('admin', '{{model}}_create'))
+            return $this->response->errorForbidden();
+
+        ${{model}} = new {{Model}}();
+
+        ${{model}}->fill($request->all());
+
+        if(!${{model}}->save())
+            return $this->response->errorInternal();
+
+        return $this->response->array(['id'=>${{model}}->id]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        if(!$this->getUser()->ability('admin', '{{model}}'))
+            return $this->response->errorForbidden();
+
+        ${{model}} = {{Model}}::find($id);
+
+        if(!${{model}})
+            $this->response->errorNotFound();
+            
+        return ${{model}};
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request Object Json
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        if(!$this->getUser()->ability('admin', '{{model}}_update'))
+            return $this->response->errorForbidden();
+
+        ${{model}} = {{Model}}::find($id);
+        ${{model}}->fill($request->all());
+
+        if(!${{model}}->save())
+            return $this->response->errorInternal();
+
+        return $this->response->noContent();
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        if(!$this->getUser()->ability('admin', '{{model}}_delete'))
+            return $this->response->errorForbidden();
+
+        ${{model}} = {{Model}}::find($id);
+
+        if(${{model}}->delete())
+            return $this->response->noContent();
+        else
+            return $this->response->errorInternal();
+    }
+}
