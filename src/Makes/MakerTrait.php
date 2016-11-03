@@ -93,7 +93,7 @@ trait MakerTrait
                 $viewFiles[str_replace($rootViewsPath, '', $file)] = $file;
             }
         }
-        
+
         return $viewFiles;
     }
 
@@ -121,7 +121,7 @@ trait MakerTrait
      */
     protected function parseFile($stubName, $stubFile)
     {
-
+        $meta = $this->getMeta();
         $stubName = str_replace('.stub','',$stubName);
         $fileTree = explode('/',$stubName);
 
@@ -133,7 +133,7 @@ trait MakerTrait
         $filePath = implode('/', $fileTree);
 
         $return = new stdClass();
-        $return->path = $this->buildStub($this->getMeta(),$filePath);
+        $return->path = $this->buildStub($meta,$filePath);
 
         $stubFile = $this->getFile($stubFile);
 

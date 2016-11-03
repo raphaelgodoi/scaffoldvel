@@ -87,7 +87,7 @@ class ScaffoldMakeCommand extends Command
         $this->comment("----------- $dump -----------");
 
         $this->composer->dumpAutoloads();
-        $this->error("Don't forget to adjust: 'migrate' and 'routes'");
+        $this->error("Don't forget to adjust: 'migrate', 'routes' and 'app.js'");
 
     }
 
@@ -143,6 +143,13 @@ class ScaffoldMakeCommand extends Command
             $this->files->put($file->path.DIRECTORY_SEPARATOR.$file->name, $file->stub);
             $this->info('+ '.$file->name);
         }
+
+        $this->line("\n------ Aditional commands you can run -----");
+
+        $meta = $this->getMeta();
+
+        $this->info("php artisan migrate");
+        $this->info("php artisan db:seed --class={$meta['Model']}TableSeeder");
     }
 
 

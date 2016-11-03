@@ -8,7 +8,7 @@
             <div class="btn-group" user="group">
                 <button ng-click="toggleEdit()" ng-if="!editing" type="button" class="btn btn-outline btn-default">{{trans('site.edit')}}</button>
                 <button ng-click="confirmUpdate()" ng-if="editing" type="button" class="btn btn-outline btn-primary"><strong>{{trans('site.completed')}}</strong></button>
-                <button ng-click="toggleEdit()" ng-if="editing" type="button" class="btn btn-outline btn-default">{{trans('site.edit')}}</button>
+                <button ng-click="toggleEdit()" ng-if="editing" type="button" class="btn btn-outline btn-default">{{trans('site.cancel')}}</button>
             </div>
         </div>
     </section>
