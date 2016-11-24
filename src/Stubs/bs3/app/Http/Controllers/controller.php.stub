@@ -20,10 +20,12 @@ class {{Model}}Controller extends Controller
      */
     public function index(Request $request)
     {
-        if(!$this->getUser()->ability('admin', '{{model}}'))
+        $user = $this->getUser();
+        if(!$user->ability('admin', '{{model}}'))
             return $this->response->errorForbidden();
 
-        ${{models}} = new {{Model}}();
+        ${{models}} = (new {{Model}})
+            ->where('company_id', $user->companies->first()->id);
 
         if($request->has('filter')){
             foreach ($request->get('filter') as $key => $value) {
@@ -48,12 +50,14 @@ class {{Model}}Controller extends Controller
      */
     public function store(Request $request)
     {
-        if(!$this->getUser()->ability('admin', '{{model}}_create'))
+        $user = $this->getUser();
+        if(!$user->ability('admin', '{{model}}_create'))
             return $this->response->errorForbidden();
 
         ${{model}} = new {{Model}}();
 
         ${{model}}->fill($request->all());
+        ${{model}}->company_id = $user->companies->first()->id;
 
         if(!${{model}}->save())
             return $this->response->errorInternal();
@@ -76,7 +80,7 @@ class {{Model}}Controller extends Controller
 
         if(!${{model}})
             $this->response->errorNotFound();
-            
+
         return ${{model}};
     }
 
