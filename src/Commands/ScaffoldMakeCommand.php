@@ -67,6 +67,16 @@ class ScaffoldMakeCommand extends Command
     }
 
     /**
+     * Execute the console command for newer versions of Laravel.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        return $this->fire();
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
