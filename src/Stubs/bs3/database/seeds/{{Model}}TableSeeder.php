@@ -6,14 +6,15 @@ use Illuminate\Database\Seeder;
 
 class {{Model}}TableSeeder extends Seeder
 {
+
+    const ADMIN_LABEL      = 'admin';
+    const MANAGER_LABEL    = 'manager';
+    const USER_LABEL       = 'user';
+    const PROFESSIONAL     = 'professional';
+    
     public function run()
     {
 
-        const ADMIN_LABEL      = 'admin';
-        const MANAGER_LABEL    = 'manager';
-        const USER_LABEL       = 'user';
-        const PROFESSIONAL     = 'professional';
-        
         /**
          * Permissions
          */

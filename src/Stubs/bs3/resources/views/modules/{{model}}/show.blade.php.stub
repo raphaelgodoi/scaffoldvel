@@ -1,19 +1,21 @@
 <div class="container">
-    <section class="actions">
-        <h1 class="title">{{Model}}</h1>
-        <div class="pull-right">
-            <div ng-if="editing" class="btn-group" user="group">
-                <button ng-click="confirmDelete()" type="button" class="btn btn-outline btn-danger"><i class="fa fa-trash"></i> {{trans('site.remove')}}</button>
-            </div>
-            <div class="btn-group" user="group">
-                <button ng-click="toggleEdit()" ng-if="!editing" type="button" class="btn btn-outline btn-default">{{trans('site.edit')}}</button>
-                <button ng-click="confirmUpdate()" ng-if="editing" type="button" class="btn btn-outline btn-primary"><strong>{{trans('site.completed')}}</strong></button>
-                <button ng-click="toggleEdit()" ng-if="editing" type="button" class="btn btn-outline btn-default">{{trans('site.cancel')}}</button>
-            </div>
-        </div>
-    </section>
 
-    <form name="form" class="">
+    @ability('admin', '{{model}}_update')
+    <section class="actions">
+        <div class="btn-group" user="group">
+            <button ng-click="toggleEdit()" ng-if="!editing" type="button" class="btn btn-outline btn-default">{{trans('site.edit')}}</button>
+            <button ng-click="toggleEdit()" ng-if="editing" type="button" class="btn btn-outline btn-default">{{trans('site.cancel')}}</button>
+            <button ng-click="confirmUpdate()" ng-if="editing" type="button" class="btn btn-outline btn-primary"><strong>{{trans('site.completed')}}</strong></button>
+        </div>
+        @ability('admin', '{{model}}_delete')
+        <div ng-if="editing" class="btn-group" user="group">
+            <button ng-click="confirmDelete()" type="button" class="btn btn-outline btn-danger"><i class="fa fa-trash"></i> {{trans('site.remove')}}</button>
+        </div>
+        @endability
+    </section>
+     @endability
+
+    <form name="form">
         {{fields}}
     </form>
 </div>
