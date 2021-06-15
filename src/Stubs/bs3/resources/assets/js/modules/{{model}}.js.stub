@@ -93,7 +93,7 @@ controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '
     ${{model}}.get({
         hash: $stateParams.hash
     }).$promise.then(function(data) {
-        $scope.{{model}} = data.{{model}};
+        $scope.{{model}} = data;
     }, function(error) {
         if (error.status == 404) {
             $state.go('notFound');
