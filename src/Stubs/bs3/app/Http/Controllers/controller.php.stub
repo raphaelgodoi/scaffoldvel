@@ -8,10 +8,7 @@ use App\{{Model}};
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-<<<<<<< HEAD
-=======
 use Vinkla\Hashids\Facades\Hashids;
->>>>>>> b676fd26c4637efe7656dfcded54fa461f45b9f8
 use Hashids\Hashids;
 use Config;
 
