@@ -160,6 +160,10 @@ class ScaffoldMakeCommand extends Command
 
         $this->info("php artisan migrate");
         $this->info("php artisan db:seed --class={$meta['Model']}TableSeeder");
+
+        $this->line("\n------ Add this to your routes/api.php -----");
+        $this->info("\$api->resource('".$meta['model']."','App\Http\Controllers\\".$meta['Model']."Controller');");
+
     }
 
 
