@@ -8,6 +8,9 @@ use App\{{Model}};
 use Dingo\Api\Routing\Helpers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Vinkla\Hashids\Facades\Hashids;
+use Hashids\Hashids;
+use Config;
 
 class {{Model}}Controller extends Controller
 {
@@ -62,7 +65,11 @@ class {{Model}}Controller extends Controller
         if(!${{model}}->save())
             return $this->response->errorInternal();
 
-        return $this->response->array(['id'=>${{model}}->id]);
+        $generator = new Hashids({{Model}}::class, Config::get('hashids.salt_lenth'));
+        ${{model}}->hash = $generator->encode(${{model}}->id);
+        ${{model}}->save();
+
+        return $this->response->array(['hash'=>${{model}}->hash]);
     }
 
     /**
@@ -76,7 +83,7 @@ class {{Model}}Controller extends Controller
         if(!$this->getUser()->ability('admin', '{{model}}'))
             return $this->response->errorForbidden();
 
-        ${{model}} = {{Model}}::find($id);
+        ${{model}} = {{Model}}::where('hash',$hash)->first();
 
         if(!${{model}})
             $this->response->errorNotFound();
@@ -96,7 +103,7 @@ class {{Model}}Controller extends Controller
         if(!$this->getUser()->ability('admin', '{{model}}_update'))
             return $this->response->errorForbidden();
 
-        ${{model}} = {{Model}}::find($id);
+        ${{model}} = {{Model}}::where('hash',$hash)->first();
         ${{model}}->fill($request->all());
 
         if(!${{model}}->save())
@@ -116,7 +123,7 @@ class {{Model}}Controller extends Controller
         if(!$this->getUser()->ability('admin', '{{model}}_delete'))
             return $this->response->errorForbidden();
 
-        ${{model}} = {{Model}}::find($id);
+        ${{model}} = {{Model}}::where('hash',$hash)->first();
 
         if(${{model}}->delete())
             return $this->response->noContent();

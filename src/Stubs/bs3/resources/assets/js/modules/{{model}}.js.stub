@@ -1,6 +1,6 @@
 angular.module('{{model}}', ['ui.router','confirm.modal.html', 'ngResource', 'ngTable', 'ui.bootstrap']);
 
-angular.module('{{model}}').config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+angular.module('{{model}}').config(['$stateProvider', function($stateProvider) {
 
     $stateProvider
     .state('{{model}}', {
@@ -30,7 +30,7 @@ angular.module('{{model}}').config(['$stateProvider', '$urlRouterProvider', func
     })
 
     .state('{{model}}_show', {
-        url         : "/{{model}}/:id",
+        url         : "/{{model}}/:hash",
         templateUrl : server+"/views/m/{{model}}/show",
         controller  : '{{model}}.show',
         resolve     : {
@@ -38,7 +38,7 @@ angular.module('{{model}}').config(['$stateProvider', '$urlRouterProvider', func
         },
         ncyBreadcrumb: {
             parent: '{{model}}',
-            label: '{{{{model}}.id}}'
+            label: '{{{{model}}.hash}}'
         }
     })
 
@@ -72,7 +72,7 @@ controller('{{model}}.create', ['$scope', '$state', '${{model}}', function($scop
     $scope.save = function() {
         ${{model}}.save($scope.{{model}}).$promise.then(function(data) {
             $state.go('{{model}}_show', {
-                id: data.id
+                hash: data.hash
             });
         });
     }
@@ -91,7 +91,7 @@ controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '
     }
 
     ${{model}}.get({
-        id: $stateParams.id
+        hash: $stateParams.hash
     }).$promise.then(function(data) {
         $scope.{{model}} = data.{{model}};
     }, function(error) {
@@ -116,7 +116,7 @@ controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '
 
                 $scope.confirm = function() {
                     ${{model}}.update({
-                        id: {{model}}.id
+                        hash: {{model}}.hash
                     }, {{model}}).$promise.then(function(data) {
                         $uibModalInstance.dismiss('cancel');
                         $scope.$parent.toggleEdit();
@@ -146,7 +146,7 @@ controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '
                 var {{model}} = $scope.$parent.{{model}};
 
                 $scope.confirm = function() {
-                    ${{model}}.delete({id:{{model}}.id}).$promise.then(function(data){
+                    ${{model}}.delete({hash:{{model}}.hash}).$promise.then(function(data){
                         $uibModalInstance.dismiss('cancel');
                         $state.go('{{model}}');
                     })
@@ -167,8 +167,8 @@ controller('{{model}}.show', ['$state', '$scope', '$stateParams', '$uibModal', '
  * Factory
  */
 angular.module('{{model}}').
-factory("${{model}}", function($resource) {
-    var resource = $resource(api + '{{model}}/:id', null, {
+factory("${{model}}", ['$resource',function($resource) {
+    var resource = $resource(api + '{{model}}/:hash', null, {
         'query': {
             method: 'GET',
             isArray: false
@@ -178,4 +178,4 @@ factory("${{model}}", function($resource) {
         }
     });
     return resource;
-});
+}]);
