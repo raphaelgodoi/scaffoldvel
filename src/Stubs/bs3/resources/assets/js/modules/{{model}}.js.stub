@@ -179,15 +179,3 @@ factory("${{model}}", function($resource) {
     });
     return resource;
 });
-
-angular.module("confirm.modal.html", []).run(["$templateCache", function($templateCache) {
-    $templateCache.put('confirm.modal.html',
-        '<div class="modal-body">' +
-        ' {{title}}' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '    <button class="btn btn-link btn-info" type="button" ng-click="cancel()">{{cancel_text}}</button>' +
-        '    <button class="btn btn-outline btn-success" type="button" ng-click="confirm()">{{success_text}}</button>' +
-        '</div>'
-    );
-}]);

@@ -25,7 +25,7 @@ class {{Model}}Controller extends Controller
             return $this->response->errorForbidden();
 
         ${{models}} = (new {{Model}})
-            ->where('company_id', $user->companies->first()->id);
+            ->where('company_id', $request->i);
 
         if($request->has('filter')){
             foreach ($request->get('filter') as $key => $value) {
@@ -39,7 +39,7 @@ class {{Model}}Controller extends Controller
             }
         }
 
-        return ${{models}}->paginate($request->get('count'));
+        return ${{models}}->paginate($request->count);
     }
 
     /**
@@ -57,7 +57,7 @@ class {{Model}}Controller extends Controller
         ${{model}} = new {{Model}}();
 
         ${{model}}->fill($request->all());
-        ${{model}}->company_id = $user->companies->first()->id;
+        ${{model}}->company_id = $request->i;
 
         if(!${{model}}->save())
             return $this->response->errorInternal();
